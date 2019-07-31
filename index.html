@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KPT BOARD</title>
+    <!-- BootstrapのCSS読み込み -->
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet" /> -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <!-- jQuery読み込み -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- BootstrapのJS読み込み -->
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
+    <script>
+      // =============================
+      //  関数は先に読み込んでおきたいのでヘッダー部
+      // ==============================
+
+      // ==============================
+      //  関数定義領域
+      // ==============================
+      function sleep(waitSec, callbackFunc) {
+        var spanedSec = 0;
+
+        var waitFunc = function() {
+          spanedSec++;
+
+          if (spanedSec >= waitSec) {
+            if (callbackFunc) callbackFunc();
+            return;
+          }
+
+          clearTimeout(id);
+          id = setTimeout(waitFunc, 1000);
+        };
+
+        var id = setTimeout(waitFunc, 1000);
+      }
+    </script>
+    <style>
+      textarea {
+        /* margin: auto; */
+        /* width: 50%;
+        height: 50%; */
+      }
+      body {
+        background: rgb(230, 230, 230);
+        width: 100%;
+        height: 100%;
+      }
+      button {
+        margin: 5px;
+      }
+      .container {
+        /* margin: auto;
+        width: 1024px;
+        height: 960px; */
+      }
+      textarea {
+        margin: 5px 0px;
+      }
+      .card {
+        margin: 5px 0px;
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+      }
+      .overlay {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1;
+        /* 変更 */
+        transition: opacity 0.5s, visibility 0.5s;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .modal-window {
+        width: 60%;
+        height: auto;
+        margin: 0 0;
+        /* position: fixed; */
+        /* border: 2px solid #d04255; */
+        /* background-color: #f4f5f7; */
+        /* z-index: 2; */
+        /* 変更 */
+        /* transition: opacity 0.5s, visibility 0.5s; */
+        opacity: 0;
+        visibility: hidden;
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+
+        background: #f4f5f7; /*背景は白*/
+        position: absolute; /*絶対位置を指定(スクロールで動く)*/
+        top: 100px; /*縦に0pxの位置から描画*/
+        right: 0px; /*右に0距離から描画を始める*/
+        left: 0px; /*左に0距離から描画を始める*/
+        /* margin: 0 auto; 左右中央寄せ */
+        padding: 0px; /*内側に余白*/
+        border-radius: 5px; /*ちょっと角を丸くする*/
+        border: 0px solid rgb(20, 19, 19); /*黒1px実線で縁取り*/
+        z-index: 2;
+        transform: translate(0px, -500px); /*[POINT]マイナス方向に動かして画面外に飛ばしておく*/
+        transition: 0.5s; /*[POINT]0.8秒かけて移動させる(アニメーション)*/
+      }
+      .modal-content {
+        width: 100%;
+        height: 100%;
+      }
+      .overlay.is-show {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(0px, 0px);
+      }
+      .modal-window.is-show {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(0px, 0px);
+      }
+      #close {
+        cursor: pointer;
+      }
+      .imagePreview {
+        width: 100%;
+        height: 180px;
+        background-position: center center;
+        background-size: cover;
+        -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+      }
+
+      /* ghostClass */
+      .ghost {
+        opacity: 0.5;
+        background: #007bff;
+      }
+      .header-bg {
+        background-size: cover; /*この場合は幅が自動設定*/
+        background-size: 100%;
+        width: 100%;
+        background-image: url("./assets/img/bg_school_rouka.jpg");
+        background-position: center;
+      }
+
+      /* ページのカスタムCSS
+-------------------------------------------------- */
+      /* フッタを画面下部に固定の設定とは無関係 */
+      body,
+      #wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      footer {
+        margin-top: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 
+      # TODOリスト
+        - [x] タイトル画像作成
+        - [x] SortableJS導入
+        - [ ] DB登録機能
+        - [ ] 詳細登録モーダル作成
+        - [ ] DONEリスト作成
+        - 
+     -->
+    <div id="wrapper">
+      <div class="jumbotron jumbotron-fluid text-center">
+        <div class="container">
+          <h1 class="display-3">KPT Board</h1>
+          <p class="lead">Keep Problem Try Things</p>
+        </div>
+      </div>
+      <main>
+        <div id="ovl" class="overlay"></div>
+        <div id="mdl" class="modal-window">
+          <div class="container modal-content">
+            <div class="modal-header">
+              <h3>カード詳細</h3>
+              <span id="close" class="text-right">✕</span>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="control-label col-xs-2"><i class="fas fa-heading"></i> タイトル</label>
+                  <div class="col-xs-5">
+                    <input type="text" name="name" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-xs-2"><i class="far fa-edit"></i> 詳細</label>
+                  <div class="col-xs-5">
+                    <textarea name="detail" class="form-control" rows="3" placeholder="詳細を入力..."></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-xs-2"><i class="fas fa-image"></i> イメージ</label>
+                  <div class="imagePreview"></div>
+                  <div class="input-group">
+                    <label class="input-group-btn">
+                      <span class="btn btn-primary">
+                        選択<input type="file" style="display:none" class="uploadFile" />
+                      </span>
+                    </label>
+                    <input type="text" class="form-control" readonly="" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-xs-12">作成日時：</label
+                  ><span id="createDate">yyyy/mm/dd(aaa) hh:mm:sss</span>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-xs-12">更新日時：</label
+                  ><span id="updateDate">yyyy/mm/dd(aaa) hh:mm:sss</span>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-12">
+                    <button type="submit" class="btn btn-success float-right">保存</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="container-fluid">
+          <div class="container-fluid mx-auto">
+            <div class="row">
+              <!-- 
+                ### KEEP & PROBLEM エリア
+               -->
+              <div class="col-lg-8 col-md-12 container-fluid">
+                <div class="row">
+                  <div class="col-sm-6 col-xs-12 py-2">
+                    <div class="card">
+                      <div class="card-header text-white bg-success font-weight-bold">
+                        KEEP
+                      </div>
+                      <div class="card-body">
+                        <div class="list-group" id="keepList">
+                          <div class="card list-group-item">
+                            <div class="card-text">
+                              カードテキスト
+                            </div>
+                          </div>
+                          <div class="card list-group-item">
+                            <div class="card-text">
+                              カードテキスト
+                            </div>
+                          </div>
+                          <div class="card list-group-item">
+                            <div class="card-text">
+                              カードテキスト
+                            </div>
+                          </div>
+                        </div>
+                        <textarea
+                          class="form-control"
+                          id="exampleFormControlTextarea1"
+                          rows="2"
+                          placeholder="タイトルを入力..."
+                        ></textarea>
+                        <button class="btn btn-outline-success">カードを追加</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-xs-12 py-2">
+                    <div class="card">
+                      <div class="card-header text-white bg-danger font-weight-bold">
+                        PROBLEM
+                      </div>
+                      <div class="card-body">
+                        <div class="list-group" id="problemList">
+                          <div class="card list-group-item">
+                            <div class="card-text">
+                              カードテキスト
+                            </div>
+                          </div>
+                        </div>
+                        <textarea
+                          class="form-control"
+                          id="exampleFormControlTextarea1"
+                          rows="2"
+                          placeholder="タイトルを入力..."
+                        ></textarea>
+                        <button class="btn btn-outline-success">カードを追加</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 
+                ### TRY エリア
+               -->
+              <div class="col-lg-4 col-md-12 py-2 container-fluid">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header text-white bg-primary font-weight-bold">
+                        TRY
+                      </div>
+                      <div class="card-body">
+                        <div class="list-group" id="tryList">
+                          <div class="card list-group-item">
+                            <div class="card-text">
+                              カードテキスト
+                            </div>
+                          </div>
+                        </div>
+                        <textarea
+                          class="form-control"
+                          id="exampleFormControlTextarea1"
+                          rows="2"
+                          placeholder="タイトルを入力..."
+                        ></textarea>
+                        <button class="btn btn-outline-success">カードを追加</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <!-- フッタ -->
+      <footer class="footer mt-auto py-3">
+        <div class="container">
+          <span class="text-muted float-right"><small>(C) 2019-2019 t-tsutsui</small></span>
+        </div>
+      </footer>
+    </div>
+    <script>
+      // ==============================
+      // スクリプトはBody要素の直下に記載
+      // ==============================
+      // モーダル処理
+      var ovl = document.getElementById("ovl");
+      var mdl = document.getElementById("mdl");
+      $(".card-text").on("click", function() {
+        console.log(this.innerText);
+        ovl.classList.toggle("is-show");
+        mdl.classList.toggle("is-show");
+        locateCenter();
+      });
+
+      $("#ovl").on("click", function() {
+        console.log("-- 閉じる(モーダル外クリック) --");
+        ovl.classList.toggle("is-show");
+        mdl.classList.toggle("is-show");
+      });
+
+      $("#close").on("click", function() {
+        console.log("-- 閉じる(ボタンクリック) --");
+        ovl.classList.toggle("is-show");
+        mdl.classList.toggle("is-show");
+      });
+
+      $(window).resize(locateCenter);
+
+      function locateCenter() {
+        let w = $(window).width();
+        let h = $(window).height();
+        let top = $(window).scrollTop() + 50;
+        console.log("top -> " + top);
+
+        let cw = $("#mdl").outerWidth();
+        let ch = $("#mdl").outerHeight();
+
+        $("#mdl").css({
+          left: (w - cw) / 2 + "px",
+          top: (h - ch) / 2 + "px"
+        });
+        $(".modal-window.is-show").css("transform", `translate(0px, ${top}px)`);
+      }
+
+      //
+      $(document).on("change", ":file", function() {
+        var input = $(this),
+          numFiles = input.get(0).files ? input.get(0).files.length : 1,
+          label = input
+            .val()
+            .replace(/\\/g, "/")
+            .replace(/.*\//, "");
+        input
+          .parent()
+          .parent()
+          .next(":text")
+          .val(label);
+
+        var files = !!this.files ? this.files : [];
+        if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+        if (/^image/.test(files[0].type)) {
+          // only image file
+          var reader = new FileReader(); // instance of the FileReader
+          reader.readAsDataURL(files[0]); // read the local file
+          reader.onloadend = function() {
+            // set image data as background of div
+            input
+              .parent()
+              .parent()
+              .parent()
+              .prev(".imagePreview")
+              .css("background-image", "url(" + this.result + ")");
+          };
+        }
+      });
+
+      // ソート処理
+      $(function() {
+        //
+        new Sortable(keepList, {
+          group: "shared", // set both lists to same group
+          animation: 150,
+          ghostClass: "ghost"
+        });
+
+        new Sortable(problemList, {
+          group: "shared",
+          animation: 150,
+          ghostClass: "ghost"
+        });
+
+        new Sortable(tryList, {
+          group: "shared",
+          animation: 150,
+          ghostClass: "ghost"
+        });
+      });
+    </script>
+  </body>
+</html>
